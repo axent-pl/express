@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -263,27 +264,27 @@ func resolvePath(data map[string]any, segments []pathSegment) (any, error) {
 
 	for _, segment := range segments {
 		if segment.isIndex {
-			arr, ok := current.([]any)
-			if !ok {
+			v := reflect.ValueOf(current)
+			if !v.IsValid() || (v.Kind() != reflect.Slice && v.Kind() != reflect.Array) {
 				return nil, fmt.Errorf("value is not an array")
 			}
-			if segment.index < 0 || segment.index >= len(arr) {
+			if segment.index < 0 || segment.index >= v.Len() {
 				return nil, fmt.Errorf("array index out of range: %d", segment.index)
 			}
-			current = arr[segment.index]
+			current = v.Index(segment.index).Interface()
 			continue
 		}
 
-		switch typed := current.(type) {
-		case map[string]any:
-			next, ok := typed[segment.key]
-			if !ok {
-				return nil, fmt.Errorf("missing key %q", segment.key)
-			}
-			current = next
-		default:
+		v := reflect.ValueOf(current)
+		if !v.IsValid() || v.Kind() != reflect.Map || v.Type().Key().Kind() != reflect.String {
 			return nil, fmt.Errorf("value is not an object for key %q", segment.key)
 		}
+
+		next := v.MapIndex(reflect.ValueOf(segment.key))
+		if !next.IsValid() {
+			return nil, fmt.Errorf("missing key %q", segment.key)
+		}
+		current = next.Interface()
 	}
 
 	return current, nil

@@ -16,6 +16,8 @@ func TestExecuteSuccessCases(t *testing.T) {
 		"meta": map[string]any{
 			"kebab-key": "ok",
 		},
+		"numbers": []int{10, 20, 30},
+		"labels":  map[string]string{"a": "alpha"},
 	}
 
 	tests := []struct {
@@ -47,6 +49,16 @@ func TestExecuteSuccessCases(t *testing.T) {
 			name:       "quoted bracket key",
 			expression: `${meta["kebab-key"]}`,
 			want:       "ok",
+		},
+		{
+			name:       "typed slice index",
+			expression: "${numbers[1]}",
+			want:       20,
+		},
+		{
+			name:       "typed map key",
+			expression: "${labels.a}",
+			want:       "alpha",
 		},
 		{
 			name:       "default when missing",
