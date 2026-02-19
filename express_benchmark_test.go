@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+var benchmarkExecuteResult any
+
 func BenchmarkParseTemplate(b *testing.B) {
 	b.ReportAllocs()
 
@@ -45,6 +47,94 @@ func BenchmarkParseTemplate(b *testing.B) {
 				if _, err := ParseTemplate(tc.input); err != nil {
 					b.Fatalf("ParseTemplate() error = %v", err)
 				}
+			}
+		})
+	}
+}
+
+func BenchmarkExecute(b *testing.B) {
+	b.ReportAllocs()
+
+	data := map[string]any{
+		"user": map[string]any{
+			"name": "Alice",
+			"role": "admin",
+			"id":   42,
+		},
+		"org": map[string]any{
+			"teams": []any{
+				map[string]any{
+					"members": []any{
+						map[string]any{
+							"profile": map[string]any{
+								"display-name": "User0",
+							},
+						},
+					},
+				},
+				map[string]any{
+					"members": []any{
+						map[string]any{
+							"profile": map[string]any{
+								"display-name": "User1",
+							},
+						},
+					},
+				},
+				map[string]any{
+					"members": []any{
+						map[string]any{
+							"profile": map[string]any{
+								"display-name": "Primary User",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	benchmarks := []struct {
+		name       string
+		expression string
+	}{
+		{
+			name:       "literal_only",
+			expression: "just plain text without placeholders",
+		},
+		{
+			name:       "single_placeholder",
+			expression: "${user.name}",
+		},
+		{
+			name:       "single_placeholder_with_default",
+			expression: "${user.missing|anonymous}",
+		},
+		{
+			name:       "mixed_literals_and_placeholders",
+			expression: "Hello ${user.name}, role=${user.role|guest}, id=${user.id}",
+		},
+		{
+			name:       "deep_path_with_indexes",
+			expression: "${org.teams[2].members[0].profile[\"display-name\"]|n/a}",
+		},
+	}
+
+	for _, tc := range benchmarks {
+		tc := tc
+		b.Run(tc.name, func(b *testing.B) {
+			expr, err := Compile(tc.expression)
+			if err != nil {
+				b.Fatalf("Compile() error = %v", err)
+			}
+
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				result, err := expr.Execute(data)
+				if err != nil {
+					b.Fatalf("Execute() error = %v", err)
+				}
+				benchmarkExecuteResult = result
 			}
 		})
 	}
