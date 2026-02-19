@@ -30,11 +30,6 @@ func Compile(expression string) (*Expression, error) {
 	return e, nil
 }
 
-// extracts value from data based on the expression
-// Supports access by key, defaults, arrays, for string values even multiple placeholders....
-// ${someKey.innerKey}
-// ${someKey.innerKey|default}
-// ${someKey.innerKey}/${someKey.otherKey|otherdefault}
 func (e *Expression) Execute(data map[string]any) (any, error) {
 	if e == nil || e.exec == nil {
 		return nil, fmt.Errorf("expression is not compiled")
@@ -66,6 +61,7 @@ type token struct {
 
 func parseTemplate(input string) ([]token, error) {
 	var out []token
+
 	var literal strings.Builder
 
 	for i := 0; i < len(input); i++ {
