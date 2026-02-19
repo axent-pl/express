@@ -13,7 +13,7 @@ type Expression struct {
 }
 
 func Compile(expression string) (*Expression, error) {
-	tokens, err := parseTemplate(expression)
+	tokens, err := ParseTemplate(expression)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ type token struct {
 	raw        string
 }
 
-func parseTemplate(input string) ([]token, error) {
+func ParseTemplate(input string) ([]token, error) {
 	var out []token
 
 	var literal strings.Builder
