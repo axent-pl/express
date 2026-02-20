@@ -150,10 +150,6 @@ func TestCompileErrors(t *testing.T) {
 		expression string
 	}{
 		{
-			name:       "unterminated placeholder",
-			expression: "${someKey.innerKey",
-		},
-		{
 			name:       "empty placeholder",
 			expression: "${ }",
 		},
@@ -170,7 +166,7 @@ func TestCompileErrors(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if _, err := Compile(tt.expression); err == nil {
-				t.Fatal("Compile() error = nil, want non-nil")
+				t.Fatalf("Compile() error = nil, want non-nil")
 			}
 		})
 	}

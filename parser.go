@@ -3,77 +3,62 @@ package main
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
 var ErrParse = errors.New("expression parser error")
 
+var tokenizerRE = regexp.MustCompile(`\$\{([^$}|]+)(?:\|([^}]+))?\}`)
+
 func ParseTemplate(input string) ([]token, error) {
 	var out []token
 
-	var literal strings.Builder
+	matches := tokenizerRE.FindAllStringSubmatchIndex(input, -1)
+	prev := 0
 
-	for i := 0; i < len(input); i++ {
-		if i+1 < len(input) && input[i] == '$' && input[i+1] == '{' {
-			if literal.Len() > 0 {
-				out = append(out, token{
-					kind:    tokenLiteral,
-					literal: literal.String(),
-				})
-				literal.Reset()
-			}
+	for _, m := range matches {
+		start, end := m[0], m[1]
 
-			end := strings.IndexByte(input[i+2:], '}')
-			if end < 0 {
-				return nil, fmt.Errorf("%w: unterminated placeholder at position %d", ErrParse, i)
-			}
-			end += i + 2
-
-			raw := input[i+2 : end]
-			placeholder, err := parsePlaceholder(raw)
-			if err != nil {
-				return nil, err
-			}
-			out = append(out, placeholder)
-			i = end
-			continue
+		// literal before placeholder
+		if start > prev {
+			out = append(out, token{
+				kind:    tokenLiteral,
+				literal: input[prev:start],
+			})
 		}
 
-		literal.WriteByte(input[i])
+		// placeholder
+		placeholder, parseErr := parsePlaceholder(input, m)
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		out = append(out, placeholder)
+
+		prev = end
 	}
 
-	if literal.Len() > 0 {
+	// trailing literal
+	if prev < len(input) {
 		out = append(out, token{
+			literal: input[prev:],
 			kind:    tokenLiteral,
-			literal: literal.String(),
-		})
-	}
-
-	if len(out) == 0 {
-		out = append(out, token{
-			kind:    tokenLiteral,
-			literal: "",
 		})
 	}
 
 	return out, nil
 }
 
-func parsePlaceholder(raw string) (token, error) {
-	content := strings.TrimSpace(raw)
-	if content == "" {
-		return token{}, fmt.Errorf("%w: empty placeholder", ErrParse)
-	}
+func parsePlaceholder(input string, m []int) (token, error) {
+	pathStart, pathEnd := m[2], m[3]
+	defStart, defEnd := m[4], m[5]
+	pathExpr := input[pathStart:pathEnd]
 
-	pathExpr := content
 	def := ""
-	hasDefault := false
-
-	if idx := strings.IndexByte(content, '|'); idx >= 0 {
-		pathExpr = strings.TrimSpace(content[:idx])
-		def = content[idx+1:]
-		hasDefault = true
+	hasDefault := defStart > -1 && defEnd > -1
+	if hasDefault {
+		def = input[defStart:defEnd]
 	}
 
 	segments, err := parsePath(pathExpr)
@@ -86,7 +71,6 @@ func parsePlaceholder(raw string) (token, error) {
 		segments:   segments,
 		hasDefault: hasDefault,
 		def:        def,
-		raw:        content,
 	}, nil
 }
 
