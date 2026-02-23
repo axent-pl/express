@@ -136,9 +136,9 @@ lexer.go:45:3: variable name 't' is too short for the scope of its usage (varnam
 lexer.go:129:2: variable name 'i' is too short for the scope of its usage (varnamelen)
 	i := 0
 	^
-lexer.go:202:6: variable name 'i' is too short for the scope of its usage (varnamelen)
-	for i := start + 1; i < len(path); i++ {
-	    ^
+yaml_unmarshal_decorator.go:214:7: variable name 'i' is too short for the scope of its usage (varnamelen)
+		for i := range value.NumField() {
+		    ^
 yaml_unmarshal_decorator.go:255:7: variable name 'i' is too short for the scope of its usage (varnamelen)
 		for i := range length {
 		    ^
