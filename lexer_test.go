@@ -89,6 +89,24 @@ func TestLexer_Lex(t *testing.T) {
 			wantErrMessage: "multiline expressions are not allowed",
 			wantErr:        true,
 		},
+		{
+			name:           "empty bracket segment",
+			input:          "${users[]}",
+			wantErrMessage: "empty bracket",
+			wantErr:        true,
+		},
+		{
+			name:           "empty bracket segment (space)",
+			input:          "${users[ ]}",
+			wantErrMessage: "empty bracket",
+			wantErr:        true,
+		},
+		{
+			name:           "empty path segment",
+			input:          "${}",
+			wantErrMessage: "placeholder path is empty",
+			wantErr:        true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
