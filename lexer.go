@@ -36,6 +36,7 @@ func (l *Lexer) Lex() ([]token, error) {
 	l.position = 0
 
 	tokens := []token{}
+
 	for {
 		t, err := l.Next()
 		if err != nil {
@@ -50,10 +51,6 @@ func (l *Lexer) Lex() ([]token, error) {
 	}
 }
 
-func (l *Lexer) checkPlaceholderStart() bool {
-	return l.position+1 < l.expressionLen && l.expression[l.position] == '$' && l.expression[l.position+1] == '{'
-}
-
 func (l *Lexer) Next() (token, error) {
 	if l.position >= l.expressionLen {
 		return token{}, io.EOF
@@ -66,6 +63,7 @@ func (l *Lexer) Next() (token, error) {
 	if l.checkPlaceholderStart() {
 		start := l.position
 		end := strings.IndexByte(l.expression[start:], '}')
+
 		if end < 0 {
 			return token{}, errLexerMissingClosingBrace
 		}
@@ -79,6 +77,7 @@ func (l *Lexer) Next() (token, error) {
 		pathExpr := inner
 		def := ""
 		hasDefault := false
+
 		if before, after, ok := strings.Cut(inner, "|"); ok {
 			pathExpr = before
 			def = after
@@ -107,9 +106,11 @@ func (l *Lexer) Next() (token, error) {
 		if l.expression[l.position] == '\n' || l.expression[l.position] == '\r' {
 			return token{}, errLexerMultilineExpression
 		}
+
 		if strings.HasPrefix(l.expression[l.position:], "${") {
 			break
 		}
+
 		l.position++
 	}
 
@@ -118,6 +119,10 @@ func (l *Lexer) Next() (token, error) {
 		literal: l.expression[start:l.position],
 		raw:     l.expression[start:l.position],
 	}, nil
+}
+
+func (l *Lexer) checkPlaceholderStart() bool {
+	return l.position+1 < l.expressionLen && l.expression[l.position] == '$' && l.expression[l.position+1] == '{'
 }
 
 func parsePathSegments(path string) ([]pathSegment, error) {
@@ -156,6 +161,7 @@ func parsePathSegments(path string) ([]pathSegment, error) {
 				if parseErr != nil {
 					return nil, fmt.Errorf("%w %q in %q", errLexerInvalidIndex, content, path)
 				}
+
 				segments = append(segments, pathSegment{
 					key:     "",
 					index:   idx,

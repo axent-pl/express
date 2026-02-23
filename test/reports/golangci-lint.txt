@@ -1,28 +1,22 @@
-express.go:127:1: calculated cyclomatic complexity for function resolvePath is 12, max is 10 (cyclop)
+express.go:105:1: calculated cyclomatic complexity for function resolvePath is 12, max is 10 (cyclop)
 func resolvePath(data map[string]any, segments []pathSegment) (any, error) {
 ^
-lexer.go:51:1: calculated cyclomatic complexity for function Next is 13, max is 10 (cyclop)
-func (l *Lexer) Next() (token, error) {
-^
-lexer.go:117:1: calculated cyclomatic complexity for function parsePathSegments is 18, max is 10 (cyclop)
+lexer.go:122:1: calculated cyclomatic complexity for function parsePathSegments is 14, max is 10 (cyclop)
 func parsePathSegments(path string) ([]pathSegment, error) {
 ^
-lexer.go:90:10: main.token is missing field literal (exhaustruct)
+lexer.go:93:10: main.token is missing field literal (exhaustruct)
 		return token{
 		       ^
-lexer.go:110:9: main.token is missing fields segments, hasDefault, def (exhaustruct)
+lexer.go:111:9: main.token is missing fields segments, hasDefault, def (exhaustruct)
 	return token{
 	       ^
-express.go:73:1: cognitive complexity 36 of func `buildExecutor` is high (> 30) (gocognit)
+express.go:51:1: cognitive complexity 36 of func `buildExecutor` is high (> 30) (gocognit)
 func buildExecutor(tokens []token) (func(data map[string]any) (any, error), error) {
 ^
-lexer.go:142:1: The line is 143 characters long, which exceeds the maximum of 120 characters. (lll)
-			if len(content) >= 2 && ((content[0] == '"' && content[len(content)-1] == '"') || (content[0] == '\'' && content[len(content)-1] == '\'')) {
-^
-express.go:81:1: `if len(tokens) == 1 && tokens[0].kind == tokenPlaceholder` has complex nested blocks (complexity: 5) (nestif)
+express.go:59:1: `if len(tokens) == 1 && tokens[0].kind == tokenPlaceholder` has complex nested blocks (complexity: 5) (nestif)
 	if len(tokens) == 1 && tokens[0].kind == tokenPlaceholder {
 ^
-lexer.go:131:1: `if path[i] == '['` has complex nested blocks (complexity: 6) (nestif)
+lexer.go:136:1: `if path[i] == '['` has complex nested blocks (complexity: 6) (nestif)
 		if path[i] == '[' {
 ^
 express.go:41:2: return with no blank line before (nlreturn)
@@ -31,85 +25,73 @@ express.go:41:2: return with no blank line before (nlreturn)
 express.go:48:2: return with no blank line before (nlreturn)
 	return e.exec(data)
 	^
-express.go:76:3: return with no blank line before (nlreturn)
+express.go:54:3: return with no blank line before (nlreturn)
 		return func(_ map[string]any) (any, error) {
 		^
-express.go:110:7: continue with no blank line before (nlreturn)
+express.go:88:7: continue with no blank line before (nlreturn)
 						continue
 						^
-express.go:140:4: continue with no blank line before (nlreturn)
+express.go:118:4: continue with no blank line before (nlreturn)
 			continue
 			^
-lexer.go:128:4: continue with no blank line before (nlreturn)
+lexer.go:133:4: continue with no blank line before (nlreturn)
 			continue
 			^
+lexer.go:193:1: named return "endIndex" with type "int" found (nonamedreturns)
+func parseBracketIndex(path string, start int) (endIndex int, isQuoted bool, err error) {
+^
 express.go:1:1: package-comments: should have a package comment (revive)
 package main
 ^
-express.go:99:7: variable name 'b' is too short for the scope of its usage (varnamelen)
+express.go:77:7: variable name 'b' is too short for the scope of its usage (varnamelen)
 		var b strings.Builder
 		    ^
-express.go:101:7: variable name 't' is too short for the scope of its usage (varnamelen)
+express.go:79:7: variable name 't' is too short for the scope of its usage (varnamelen)
 		for _, t := range tokens {
 		    ^
-express.go:132:4: variable name 'v' is too short for the scope of its usage (varnamelen)
+express.go:110:4: variable name 'v' is too short for the scope of its usage (varnamelen)
 			v := reflect.ValueOf(current)
 			^
-lexer.go:38:3: variable name 't' is too short for the scope of its usage (varnamelen)
-		t, err := l.Next()
+lexer.go:45:3: variable name 't' is too short for the scope of its usage (varnamelen)
+		t, err := l.next()
 		^
-lexer.go:124:2: variable name 'i' is too short for the scope of its usage (varnamelen)
+lexer.go:129:2: variable name 'i' is too short for the scope of its usage (varnamelen)
 	i := 0
 	^
-lexer.go:190:6: variable name 'i' is too short for the scope of its usage (varnamelen)
+lexer.go:202:6: variable name 'i' is too short for the scope of its usage (varnamelen)
 	for i := start + 1; i < len(path); i++ {
 	    ^
-lexer.go:191:3: variable name 'ch' is too short for the scope of its usage (varnamelen)
-		ch := path[i]
-		^
 express.go:27:2: missing whitespace above this line (too many statements above if) (wsl_v5)
 	tokens, err := l.Lex()
 	^
-express.go:89:5: missing whitespace above this line (invalid statement above if) (wsl_v5)
+express.go:67:5: missing whitespace above this line (invalid statement above if) (wsl_v5)
 				if err != nil {
 				^
-express.go:112:6: missing whitespace above this line (invalid statement above if) (wsl_v5)
+express.go:90:6: missing whitespace above this line (invalid statement above if) (wsl_v5)
 					if err != nil {
 					^
-express.go:117:5: missing whitespace above this line (invalid statement above expr) (wsl_v5)
-				b.WriteString(fmt.Sprint(value))
+express.go:95:5: missing whitespace above this line (invalid statement above expr) (wsl_v5)
+				fmt.Fprint(&b, value)
 				^
-express.go:136:4: missing whitespace above this line (invalid statement above if) (wsl_v5)
+express.go:114:4: missing whitespace above this line (invalid statement above if) (wsl_v5)
 			if segment.index < 0 || segment.index >= v.Len() {
 			^
-express.go:139:4: missing whitespace above this line (invalid statement above assign) (wsl_v5)
+express.go:117:4: missing whitespace above this line (invalid statement above assign) (wsl_v5)
 			current = v.Index(segment.index).Interface()
 			^
-express.go:152:3: missing whitespace above this line (invalid statement above assign) (wsl_v5)
+express.go:130:3: missing whitespace above this line (invalid statement above assign) (wsl_v5)
 		current = next.Interface()
 		^
-lexer.go:37:2: missing whitespace above this line (no shared variables above for) (wsl_v5)
-	for {
-	^
-lexer.go:62:3: missing whitespace above this line (too many statements above if) (wsl_v5)
-		end := strings.IndexByte(l.expression[start:], '}')
+lexer.go:179:3: missing whitespace above this line (invalid statement above assign) (wsl_v5)
+		segments = append(segments, pathSegment{
 		^
-lexer.go:66:3: missing whitespace above this line (invalid statement above assign) (wsl_v5)
-		end += start
-		^
-lexer.go:76:3: missing whitespace above this line (no shared variables above if) (wsl_v5)
-		if before, after, ok := strings.Cut(inner, "|"); ok {
-		^
-lexer.go:107:3: missing whitespace above this line (invalid statement above inc-dec) (wsl_v5)
-		l.position++
-		^
-35 issues:
-* cyclop: 3
+29 issues:
+* cyclop: 2
 * exhaustruct: 2
 * gocognit: 1
-* lll: 1
 * nestif: 2
 * nlreturn: 6
+* nonamedreturns: 1
 * revive: 1
-* varnamelen: 7
-* wsl_v5: 12
+* varnamelen: 6
+* wsl_v5: 8
