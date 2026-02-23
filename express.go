@@ -1,9 +1,20 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
+)
+
+var (
+	errExpressionNotCompiled = errors.New("expression is not compiled")
+	errValueNil              = errors.New("value is nil")
+	errUnknownTokenKind      = errors.New("unknown token kind")
+	errValueNotArray         = errors.New("value is not an array")
+	errArrayIndexOutOfRange  = errors.New("array index out of range")
+	errValueNotObject        = errors.New("value is not an object")
+	errMissingKey            = errors.New("missing key")
 )
 
 type Expression struct {
@@ -32,31 +43,9 @@ func Compile(expression string) (*Expression, error) {
 
 func (e *Expression) Execute(data map[string]any) (any, error) {
 	if e == nil || e.exec == nil {
-		return nil, fmt.Errorf("expression is not compiled")
+		return nil, errExpressionNotCompiled
 	}
 	return e.exec(data)
-}
-
-type tokenKind int
-
-const (
-	tokenLiteral tokenKind = iota
-	tokenPlaceholder
-)
-
-type pathSegment struct {
-	key     string
-	index   int
-	isIndex bool
-}
-
-type token struct {
-	kind       tokenKind
-	literal    string
-	segments   []pathSegment
-	hasDefault bool
-	def        string
-	raw        string
 }
 
 func buildExecutor(tokens []token) (func(data map[string]any) (any, error), error) {
@@ -78,7 +67,7 @@ func buildExecutor(tokens []token) (func(data map[string]any) (any, error), erro
 				if err != nil {
 					return nil, err
 				}
-				return nil, fmt.Errorf("value for %q is nil", placeholder.raw)
+				return nil, fmt.Errorf("%w for %q", errValueNil, placeholder.raw)
 			}
 			return value, nil
 		}, nil
@@ -101,11 +90,11 @@ func buildExecutor(tokens []token) (func(data map[string]any) (any, error), erro
 					if err != nil {
 						return nil, err
 					}
-					return nil, fmt.Errorf("value for %q is nil", t.raw)
+					return nil, fmt.Errorf("%w for %q", errValueNil, t.raw)
 				}
-				b.WriteString(fmt.Sprint(value))
+				fmt.Fprint(&b, value)
 			default:
-				return nil, fmt.Errorf("unknown token kind")
+				return nil, errUnknownTokenKind
 			}
 		}
 
@@ -120,10 +109,10 @@ func resolvePath(data map[string]any, segments []pathSegment) (any, error) {
 		if segment.isIndex {
 			v := reflect.ValueOf(current)
 			if !v.IsValid() || (v.Kind() != reflect.Slice && v.Kind() != reflect.Array) {
-				return nil, fmt.Errorf("value is not an array")
+				return nil, errValueNotArray
 			}
 			if segment.index < 0 || segment.index >= v.Len() {
-				return nil, fmt.Errorf("array index out of range: %d", segment.index)
+				return nil, fmt.Errorf("%w: %d", errArrayIndexOutOfRange, segment.index)
 			}
 			current = v.Index(segment.index).Interface()
 			continue
@@ -131,12 +120,12 @@ func resolvePath(data map[string]any, segments []pathSegment) (any, error) {
 
 		v := reflect.ValueOf(current)
 		if !v.IsValid() || v.Kind() != reflect.Map || v.Type().Key().Kind() != reflect.String {
-			return nil, fmt.Errorf("value is not an object for key %q", segment.key)
+			return nil, fmt.Errorf("%w for key %q", errValueNotObject, segment.key)
 		}
 
 		next := v.MapIndex(reflect.ValueOf(segment.key))
 		if !next.IsValid() {
-			return nil, fmt.Errorf("missing key %q", segment.key)
+			return nil, fmt.Errorf("%w %q", errMissingKey, segment.key)
 		}
 		current = next.Interface()
 	}

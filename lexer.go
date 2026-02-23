@@ -1,10 +1,21 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
 	"strings"
+)
+
+var (
+	errLexerMultilineExpression    = errors.New("lexer error: multiline expressions are not allowed")
+	errLexerMissingClosingBrace    = errors.New("lexer error: missing closing '}' for placeholder")
+	errLexerPlaceholderPathEmpty   = errors.New("lexer error: placeholder path is empty")
+	errLexerEmptyBracketSegment    = errors.New("lexer error: empty bracket segment in path")
+	errLexerInvalidIndex           = errors.New("lexer error: invalid index in path")
+	errLexerEmptyPathSegment       = errors.New("lexer error: empty path segment")
+	errLexerMissingClosingBracket  = errors.New("lexer error: missing closing ']' in path")
 )
 
 type Lexer struct {
@@ -25,14 +36,15 @@ func (l *Lexer) Lex() ([]token, error) {
 	tokens := []token{}
 	for {
 		t, err := l.Next()
-		switch err {
-		case nil:
-			tokens = append(tokens, t)
-		case io.EOF:
-			return tokens, nil
-		default:
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return tokens, nil
+			}
+
 			return nil, err
 		}
+
+		tokens = append(tokens, t)
 	}
 }
 
@@ -42,20 +54,20 @@ func (l *Lexer) Next() (token, error) {
 	}
 
 	if l.expression[l.position] == '\n' || l.expression[l.position] == '\r' {
-		return token{}, fmt.Errorf("lexer error: multiline expressions are not allowed")
+		return token{}, errLexerMultilineExpression
 	}
 
 	if strings.HasPrefix(l.expression[l.position:], "${") {
 		start := l.position
 		end := strings.IndexByte(l.expression[start:], '}')
 		if end < 0 {
-			return token{}, fmt.Errorf("lexer error: missing closing '}' for placeholder")
+			return token{}, errLexerMissingClosingBrace
 		}
 		end += start
 
 		inner := l.expression[start+2 : end]
 		if strings.ContainsAny(inner, "\n\r") {
-			return token{}, fmt.Errorf("lexer error: multiline expressions are not allowed")
+			return token{}, errLexerMultilineExpression
 		}
 
 		pathExpr := inner
@@ -87,7 +99,7 @@ func (l *Lexer) Next() (token, error) {
 	start := l.position
 	for l.position < len(l.expression) {
 		if l.expression[l.position] == '\n' || l.expression[l.position] == '\r' {
-			return token{}, fmt.Errorf("lexer error: multiline expressions are not allowed")
+			return token{}, errLexerMultilineExpression
 		}
 		if strings.HasPrefix(l.expression[l.position:], "${") {
 			break
@@ -105,7 +117,7 @@ func (l *Lexer) Next() (token, error) {
 func parsePathSegments(path string) ([]pathSegment, error) {
 	path = strings.TrimSpace(path)
 	if path == "" {
-		return nil, fmt.Errorf("lexer error: placeholder path is empty")
+		return nil, errLexerPlaceholderPathEmpty
 	}
 
 	segments := make([]pathSegment, 0)
@@ -124,7 +136,7 @@ func parsePathSegments(path string) ([]pathSegment, error) {
 
 			content := strings.TrimSpace(path[i+1 : end])
 			if content == "" {
-				return nil, fmt.Errorf("lexer error: empty bracket segment in path %q", path)
+				return nil, fmt.Errorf("%w %q", errLexerEmptyBracketSegment, path)
 			}
 
 			if len(content) >= 2 && ((content[0] == '"' && content[len(content)-1] == '"') || (content[0] == '\'' && content[len(content)-1] == '\'')) {
@@ -136,7 +148,7 @@ func parsePathSegments(path string) ([]pathSegment, error) {
 			} else {
 				idx, parseErr := strconv.Atoi(content)
 				if parseErr != nil {
-					return nil, fmt.Errorf("lexer error: invalid index %q in path %q", content, path)
+					return nil, fmt.Errorf("%w %q in %q", errLexerInvalidIndex, content, path)
 				}
 				segments = append(segments, pathSegment{
 					key:     "",
@@ -156,7 +168,7 @@ func parsePathSegments(path string) ([]pathSegment, error) {
 
 		part := strings.TrimSpace(path[start:i])
 		if part == "" {
-			return nil, fmt.Errorf("lexer error: empty path segment in %q", path)
+			return nil, fmt.Errorf("%w in %q", errLexerEmptyPathSegment, path)
 		}
 		segments = append(segments, pathSegment{
 			key:     part,
@@ -166,7 +178,7 @@ func parsePathSegments(path string) ([]pathSegment, error) {
 	}
 
 	if len(segments) == 0 {
-		return nil, fmt.Errorf("lexer error: placeholder path is empty")
+		return nil, errLexerPlaceholderPathEmpty
 	}
 
 	return segments, nil
@@ -194,5 +206,5 @@ func findClosingBracket(path string, start int) (int, error) {
 		}
 	}
 
-	return -1, fmt.Errorf("lexer error: missing closing ']' in path %q", path)
+	return -1, fmt.Errorf("%w %q", errLexerMissingClosingBracket, path)
 }
