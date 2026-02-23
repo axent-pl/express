@@ -7,7 +7,7 @@ import (
 
 var benchmarkExecuteResult any
 
-func BenchmarkParseTemplate(b *testing.B) {
+func BenchmarkLexer_Lex(b *testing.B) {
 	b.ReportAllocs()
 
 	benchmarks := []struct {
@@ -44,8 +44,9 @@ func BenchmarkParseTemplate(b *testing.B) {
 		tc := tc
 		b.Run(tc.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				if _, err := ParseTemplate(tc.input); err != nil {
-					b.Fatalf("ParseTemplate() error = %v", err)
+				l := NewLexer(tc.input)
+				if _, err := l.Lex(); err != nil {
+					b.Fatalf("Lexer.Lex() error = %v", err)
 				}
 			}
 		})

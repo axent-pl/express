@@ -1,145 +1,171 @@
-express.go:115:1: calculated cyclomatic complexity for function resolvePath is 12, max is 10 (cyclop)
+express.go:116:1: calculated cyclomatic complexity for function resolvePath is 12, max is 10 (cyclop)
 func resolvePath(data map[string]any, segments []pathSegment) (any, error) {
 ^
-parser.go:93:1: calculated cyclomatic complexity for function parsePath is 18, max is 10 (cyclop)
-func parsePath(path string) ([]pathSegment, error) {
+lexer.go:39:1: calculated cyclomatic complexity for function Next is 13, max is 10 (cyclop)
+func (l *Lexer) Next() (token, error) {
 ^
-express.go:34:15: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"expression is not compiled\")" (err113)
+lexer.go:105:1: calculated cyclomatic complexity for function parsePathSegments is 18, max is 10 (cyclop)
+func parsePathSegments(path string) ([]pathSegment, error) {
+^
+express.go:35:15: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"expression is not compiled\")" (err113)
 		return nil, fmt.Errorf("expression is not compiled")
 		            ^
-express.go:80:17: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"value for %q is nil\", placeholder.raw)" (err113)
+express.go:81:17: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"value for %q is nil\", placeholder.raw)" (err113)
 				return nil, fmt.Errorf("value for %q is nil", placeholder.raw)
 				            ^
-express.go:103:18: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"value for %q is nil\", t.raw)" (err113)
+express.go:104:18: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"value for %q is nil\", t.raw)" (err113)
 					return nil, fmt.Errorf("value for %q is nil", t.raw)
 					            ^
-express.go:107:17: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"unknown token kind\")" (err113)
+express.go:108:17: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"unknown token kind\")" (err113)
 				return nil, fmt.Errorf("unknown token kind")
 				            ^
-express.go:122:17: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"value is not an array\")" (err113)
+express.go:123:17: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"value is not an array\")" (err113)
 				return nil, fmt.Errorf("value is not an array")
 				            ^
-express.go:125:17: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"array index out of range: %d\", segment.index)" (err113)
+express.go:126:17: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"array index out of range: %d\", segment.index)" (err113)
 				return nil, fmt.Errorf("array index out of range: %d", segment.index)
 				            ^
-express.go:133:16: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"value is not an object for key %q\", segment.key)" (err113)
+express.go:134:16: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"value is not an object for key %q\", segment.key)" (err113)
 			return nil, fmt.Errorf("value is not an object for key %q", segment.key)
 			            ^
-express.go:138:16: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"missing key %q\", segment.key)" (err113)
+express.go:139:16: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"missing key %q\", segment.key)" (err113)
 			return nil, fmt.Errorf("missing key %q", segment.key)
 			            ^
-parser.go:20:23: main.token is missing fields segments, hasDefault, def, raw (exhaustruct)
-				out = append(out, token{
-				                  ^
-parser.go:47:21: main.token is missing fields segments, hasDefault, def, raw (exhaustruct)
-		out = append(out, token{
-		                  ^
-parser.go:54:21: main.token is missing fields segments, hasDefault, def, raw (exhaustruct)
-		out = append(out, token{
-		                  ^
-parser.go:84:9: main.token is missing field literal (exhaustruct)
+lexer.go:45:19: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: multiline expressions are not allowed\")" (err113)
+		return token{}, fmt.Errorf("lexer error: multiline expressions are not allowed")
+		                ^
+lexer.go:52:20: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: missing closing '}' for placeholder\")" (err113)
+			return token{}, fmt.Errorf("lexer error: missing closing '}' for placeholder")
+			                ^
+lexer.go:58:20: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: multiline expressions are not allowed\")" (err113)
+			return token{}, fmt.Errorf("lexer error: multiline expressions are not allowed")
+			                ^
+lexer.go:90:20: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: multiline expressions are not allowed\")" (err113)
+			return token{}, fmt.Errorf("lexer error: multiline expressions are not allowed")
+			                ^
+lexer.go:108:15: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: placeholder path is empty\")" (err113)
+		return nil, fmt.Errorf("lexer error: placeholder path is empty")
+		            ^
+lexer.go:127:17: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: empty bracket segment in path %q\", path)" (err113)
+				return nil, fmt.Errorf("lexer error: empty bracket segment in path %q", path)
+				            ^
+lexer.go:139:18: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: invalid index %q in path %q\", content, path)" (err113)
+					return nil, fmt.Errorf("lexer error: invalid index %q in path %q", content, path)
+					            ^
+lexer.go:159:16: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: empty path segment in %q\", path)" (err113)
+			return nil, fmt.Errorf("lexer error: empty path segment in %q", path)
+			            ^
+lexer.go:169:15: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: placeholder path is empty\")" (err113)
+		return nil, fmt.Errorf("lexer error: placeholder path is empty")
+		            ^
+lexer.go:197:13: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"lexer error: missing closing ']' in path %q\", path)" (err113)
+	return -1, fmt.Errorf("lexer error: missing closing ']' in path %q", path)
+	           ^
+lexer.go:31:3: switch on an error will fail on wrapped errors. Use errors.Is to check for specific errors (errorlint)
+		case io.EOF:
+		^
+lexer.go:78:10: main.token is missing field literal (exhaustruct)
+		return token{
+		       ^
+lexer.go:98:9: main.token is missing fields segments, hasDefault, def (exhaustruct)
 	return token{
 	       ^
-parser.go:120:33: main.pathSegment is missing fields index, isIndex (exhaustruct)
-				segments = append(segments, pathSegment{key: content[1 : len(content)-1]})
-				                            ^
-parser.go:126:33: main.pathSegment is missing field key (exhaustruct)
-				segments = append(segments, pathSegment{
-				                            ^
-parser.go:144:31: main.pathSegment is missing fields index, isIndex (exhaustruct)
-		segments = append(segments, pathSegment{key: part})
-		                            ^
-express.go:61:1: cognitive complexity 36 of func `buildExecutor` is high (> 30) (gocognit)
+express.go:62:1: cognitive complexity 36 of func `buildExecutor` is high (> 30) (gocognit)
 func buildExecutor(tokens []token) (func(data map[string]any) (any, error), error) {
 ^
-parser.go:119:1: The line is 143 characters long, which exceeds the maximum of 120 characters. (lll)
-			if len(content) >= 2 && ((content[0] == '\'' && content[len(content)-1] == '\'') || (content[0] == '"' && content[len(content)-1] == '"')) {
+lexer.go:130:1: The line is 143 characters long, which exceeds the maximum of 120 characters. (lll)
+			if len(content) >= 2 && ((content[0] == '"' && content[len(content)-1] == '"') || (content[0] == '\'' && content[len(content)-1] == '\'')) {
 ^
-parser.go:31:15: Magic number: 2, in <operation> detected (mnd)
-			end += i + 2
-			           ^
-parser.go:73:12: stringscut: strings.IndexByte can be simplified using strings.Cut (modernize)
-	if idx := strings.IndexByte(content, '|'); idx >= 0 {
-	          ^
-express.go:69:1: `if len(tokens) == 1 && tokens[0].kind == tokenPlaceholder` has complex nested blocks (complexity: 5) (nestif)
+express.go:70:1: `if len(tokens) == 1 && tokens[0].kind == tokenPlaceholder` has complex nested blocks (complexity: 5) (nestif)
 	if len(tokens) == 1 && tokens[0].kind == tokenPlaceholder {
 ^
-parser.go:108:1: `if path[i] == '['` has complex nested blocks (complexity: 6) (nestif)
+lexer.go:119:1: `if path[i] == '['` has complex nested blocks (complexity: 6) (nestif)
 		if path[i] == '[' {
 ^
-express.go:29:2: return with no blank line before (nlreturn)
+express.go:30:2: return with no blank line before (nlreturn)
 	return e, nil
 	^
-express.go:36:2: return with no blank line before (nlreturn)
+express.go:37:2: return with no blank line before (nlreturn)
 	return e.exec(data)
 	^
-express.go:64:3: return with no blank line before (nlreturn)
+express.go:65:3: return with no blank line before (nlreturn)
 		return func(_ map[string]any) (any, error) {
 		^
-express.go:98:7: continue with no blank line before (nlreturn)
+express.go:99:7: continue with no blank line before (nlreturn)
 						continue
 						^
-express.go:128:4: continue with no blank line before (nlreturn)
+express.go:129:4: continue with no blank line before (nlreturn)
 			continue
 			^
-parser.go:40:4: continue with no blank line before (nlreturn)
+lexer.go:116:4: continue with no blank line before (nlreturn)
 			continue
 			^
 express.go:1:1: package-comments: should have a package comment (revive)
 package main
 ^
-express.go:87:7: variable name 'b' is too short for the scope of its usage (varnamelen)
+express.go:88:7: variable name 'b' is too short for the scope of its usage (varnamelen)
 		var b strings.Builder
 		    ^
-express.go:89:7: variable name 't' is too short for the scope of its usage (varnamelen)
+express.go:90:7: variable name 't' is too short for the scope of its usage (varnamelen)
 		for _, t := range tokens {
 		    ^
-express.go:120:4: variable name 'v' is too short for the scope of its usage (varnamelen)
+express.go:121:4: variable name 'v' is too short for the scope of its usage (varnamelen)
 			v := reflect.ValueOf(current)
 			^
-parser.go:17:6: variable name 'i' is too short for the scope of its usage (varnamelen)
-	for i := 0; i < len(input); i++ {
-	    ^
-parser.go:100:2: variable name 'i' is too short for the scope of its usage (varnamelen)
+lexer.go:112:2: variable name 'i' is too short for the scope of its usage (varnamelen)
 	i := 0
 	^
-express.go:77:5: missing whitespace above this line (invalid statement above if) (wsl_v5)
+lexer.go:178:6: variable name 'i' is too short for the scope of its usage (varnamelen)
+	for i := start + 1; i < len(path); i++ {
+	    ^
+lexer.go:179:3: variable name 'ch' is too short for the scope of its usage (varnamelen)
+		ch := path[i]
+		^
+express.go:16:2: missing whitespace above this line (too many statements above if) (wsl_v5)
+	tokens, err := l.Lex()
+	^
+express.go:78:5: missing whitespace above this line (invalid statement above if) (wsl_v5)
 				if err != nil {
 				^
-express.go:100:6: missing whitespace above this line (invalid statement above if) (wsl_v5)
+express.go:101:6: missing whitespace above this line (invalid statement above if) (wsl_v5)
 					if err != nil {
 					^
-express.go:105:5: missing whitespace above this line (invalid statement above expr) (wsl_v5)
+express.go:106:5: missing whitespace above this line (invalid statement above expr) (wsl_v5)
 				b.WriteString(fmt.Sprint(value))
 				^
-express.go:124:4: missing whitespace above this line (invalid statement above if) (wsl_v5)
+express.go:125:4: missing whitespace above this line (invalid statement above if) (wsl_v5)
 			if segment.index < 0 || segment.index >= v.Len() {
 			^
-express.go:127:4: missing whitespace above this line (invalid statement above assign) (wsl_v5)
+express.go:128:4: missing whitespace above this line (invalid statement above assign) (wsl_v5)
 			current = v.Index(segment.index).Interface()
 			^
-express.go:140:3: missing whitespace above this line (invalid statement above assign) (wsl_v5)
+express.go:141:3: missing whitespace above this line (invalid statement above assign) (wsl_v5)
 		current = next.Interface()
 		^
-parser.go:34:4: missing whitespace above this line (too many statements above if) (wsl_v5)
-			placeholder, err := parsePlaceholder(raw)
-			^
-parser.go:38:4: missing whitespace above this line (invalid statement above assign) (wsl_v5)
-			out = append(out, placeholder)
-			^
-parser.go:114:4: missing whitespace above this line (too many statements above if) (wsl_v5)
-			content := strings.TrimSpace(path[i+1 : end])
-			^
-44 issues:
-* cyclop: 2
-* err113: 8
-* exhaustruct: 7
+lexer.go:26:2: missing whitespace above this line (no shared variables above for) (wsl_v5)
+	for {
+	^
+lexer.go:50:3: missing whitespace above this line (too many statements above if) (wsl_v5)
+		end := strings.IndexByte(l.expression[start:], '}')
+		^
+lexer.go:54:3: missing whitespace above this line (invalid statement above assign) (wsl_v5)
+		end += start
+		^
+lexer.go:64:3: missing whitespace above this line (no shared variables above if) (wsl_v5)
+		if before, after, ok := strings.Cut(inner, "|"); ok {
+		^
+lexer.go:95:3: missing whitespace above this line (invalid statement above inc-dec) (wsl_v5)
+		l.position++
+		^
+53 issues:
+* cyclop: 3
+* err113: 18
+* errorlint: 1
+* exhaustruct: 2
 * gocognit: 1
 * lll: 1
-* mnd: 1
-* modernize: 1
 * nestif: 2
 * nlreturn: 6
 * revive: 1
-* varnamelen: 5
-* wsl_v5: 9
+* varnamelen: 6
+* wsl_v5: 12

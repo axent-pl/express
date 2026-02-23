@@ -12,7 +12,8 @@ type Expression struct {
 }
 
 func Compile(expression string) (*Expression, error) {
-	tokens, err := ParseTemplate(expression)
+	l := NewLexer(expression)
+	tokens, err := l.Lex()
 	if err != nil {
 		return nil, err
 	}
