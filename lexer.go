@@ -37,8 +37,12 @@ func (l *Lexer) Lex() ([]token, error) {
 
 	tokens := []token{}
 
+	if strings.ContainsAny(l.expression, "\n\r") {
+		return tokens, errLexerMultilineExpression
+	}
+
 	for {
-		t, err := l.Next()
+		t, err := l.next()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				return tokens, nil
@@ -51,13 +55,9 @@ func (l *Lexer) Lex() ([]token, error) {
 	}
 }
 
-func (l *Lexer) Next() (token, error) {
+func (l *Lexer) next() (token, error) {
 	if l.position >= l.expressionLen {
 		return token{}, io.EOF
-	}
-
-	if l.expression[l.position] == '\n' || l.expression[l.position] == '\r' {
-		return token{}, errLexerMultilineExpression
 	}
 
 	if l.checkPlaceholderStart() {
@@ -67,12 +67,10 @@ func (l *Lexer) Next() (token, error) {
 		if end < 0 {
 			return token{}, errLexerMissingClosingBrace
 		}
+
 		end += start
 
 		inner := l.expression[start+2 : end]
-		if strings.ContainsAny(inner, "\n\r") {
-			return token{}, errLexerMultilineExpression
-		}
 
 		pathExpr := inner
 		def := ""
@@ -103,11 +101,7 @@ func (l *Lexer) Next() (token, error) {
 
 	start := l.position
 	for l.position < l.expressionLen {
-		if l.expression[l.position] == '\n' || l.expression[l.position] == '\r' {
-			return token{}, errLexerMultilineExpression
-		}
-
-		if strings.HasPrefix(l.expression[l.position:], "${") {
+		if l.checkPlaceholderStart() {
 			break
 		}
 
@@ -140,7 +134,7 @@ func parsePathSegments(path string) ([]pathSegment, error) {
 		}
 
 		if path[i] == '[' {
-			end, err := findClosingBracket(path, i)
+			end, isQuoted, err := parseBracketIndex(path, i)
 			if err != nil {
 				return nil, err
 			}
@@ -150,7 +144,7 @@ func parsePathSegments(path string) ([]pathSegment, error) {
 				return nil, fmt.Errorf("%w %q", errLexerEmptyBracketSegment, path)
 			}
 
-			if len(content) >= 2 && ((content[0] == '"' && content[len(content)-1] == '"') || (content[0] == '\'' && content[len(content)-1] == '\'')) {
+			if isQuoted {
 				segments = append(segments, pathSegment{
 					key:     content[1 : len(content)-1],
 					index:   0,
@@ -196,27 +190,25 @@ func parsePathSegments(path string) ([]pathSegment, error) {
 	return segments, nil
 }
 
-func findClosingBracket(path string, start int) (int, error) {
-	quote := byte(0)
+func parseBracketIndex(path string, start int) (endIndex int, isQuoted bool, err error) {
+	var openingQuote byte
 
-	for i := start + 1; i < len(path); i++ {
-		ch := path[i]
-		if quote != 0 {
-			if ch == quote {
-				quote = 0
-			}
-			continue
-		}
-
-		if ch == '"' || ch == '\'' {
-			quote = ch
-			continue
-		}
-
-		if ch == ']' {
-			return i, nil
+	if start+1 < len(path) {
+		if q := path[start+1]; q == '"' || q == '\'' {
+			openingQuote = q
 		}
 	}
 
-	return -1, fmt.Errorf("%w %q", errLexerMissingClosingBracket, path)
+	for i := start + 1; i < len(path); i++ {
+		ch := path[i]
+
+		if ch == ']' {
+			if openingQuote != 0 && i-1 > start && path[i-1] == openingQuote {
+				return i, true, nil
+			}
+			return i, false, nil
+		}
+	}
+
+	return -1, false, fmt.Errorf("%w %q", errLexerMissingClosingBracket, path)
 }
