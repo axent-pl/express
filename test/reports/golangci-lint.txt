@@ -4,14 +4,47 @@ func resolvePath(data map[string]any, segments []pathSegment) (any, error) {
 lexer.go:122:1: calculated cyclomatic complexity for function parsePathSegments is 14, max is 10 (cyclop)
 func parsePathSegments(path string) ([]pathSegment, error) {
 ^
-lexer.go:93:10: main.token is missing field literal (exhaustruct)
+yaml_unmarshal_decorator.go:9:2: import 'gopkg.in/yaml.v3' is not allowed from list 'Main' (depguard)
+	"gopkg.in/yaml.v3"
+	^
+yaml_unmarshal_decorator.go:38:10: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"out must be a non-nil pointer\")" (err113)
+		return fmt.Errorf("out must be a non-nil pointer")
+		       ^
+yaml_unmarshal_decorator.go:124:10: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"express tag requires string field\")" (err113)
+		return fmt.Errorf("express tag requires string field")
+		       ^
+yaml_unmarshal_decorator.go:191:15: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"root value must resolve to map[string]any\")" (err113)
+		return nil, fmt.Errorf("root value must resolve to map[string]any")
+		            ^
+yaml_unmarshal_decorator.go:236:16: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"map keys must be strings\")" (err113)
+			return nil, fmt.Errorf("map keys must be strings")
+			            ^
+yaml_unmarshal_decorator.go:306:26: do not define dynamic errors, use wrapped static errors instead: "fmt.Errorf(\"cannot assign %T to %s\", input, target.String())" (err113)
+	return reflect.Value{}, fmt.Errorf("cannot assign %T to %s", input, target.String())
+	                        ^
+yaml_unmarshal_decorator.go:64:2: missing cases in switch of type reflect.Kind: reflect.Invalid, reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr, reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128, reflect.Chan, reflect.Func, reflect.Interface, reflect.Pointer|reflect.Ptr, reflect.String, reflect.UnsafePointer (exhaustive)
+	switch current.Kind() {
+	^
+yaml_unmarshal_decorator.go:209:2: missing cases in switch of type reflect.Kind: reflect.Invalid, reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr, reflect.Float32, reflect.Float64, reflect.Complex64, reflect.Complex128, reflect.Chan, reflect.Func, reflect.Interface, reflect.Pointer|reflect.Ptr, reflect.String, reflect.UnsafePointer (exhaustive)
+	switch value.Kind() {
+	^
+lexer.go:93:10: express.token is missing field literal (exhaustruct)
 		return token{
 		       ^
-lexer.go:111:9: main.token is missing fields segments, hasDefault, def (exhaustruct)
+lexer.go:111:9: express.token is missing fields segments, hasDefault, def (exhaustruct)
 	return token{
 	       ^
+yaml_unmarshal_decorator.go:29:11: express.unmarshalOptions is missing field withEnv (exhaustruct)
+	opts := &unmarshalOptions{}
+	         ^
 express.go:51:1: cognitive complexity 36 of func `buildExecutor` is high (> 30) (gocognit)
 func buildExecutor(tokens []token) (func(data map[string]any) (any, error), error) {
+^
+yaml_unmarshal_decorator.go:52:1: cognitive complexity 33 of func `walkAndEvaluate` is high (> 30) (gocognit)
+func walkAndEvaluate(current reflect.Value, root reflect.Value, opts *unmarshalOptions) error {
+^
+yaml_unmarshal_decorator.go:197:1: cognitive complexity 31 of func `exportValue` is high (> 30) (gocognit)
+func exportValue(value reflect.Value) (any, error) {
 ^
 express.go:59:1: `if len(tokens) == 1 && tokens[0].kind == tokenPlaceholder` has complex nested blocks (complexity: 5) (nestif)
 	if len(tokens) == 1 && tokens[0].kind == tokenPlaceholder {
@@ -19,6 +52,12 @@ express.go:59:1: `if len(tokens) == 1 && tokens[0].kind == tokenPlaceholder` has
 lexer.go:136:1: `if path[i] == '['` has complex nested blocks (complexity: 6) (nestif)
 		if path[i] == '[' {
 ^
+yaml_unmarshal_decorator.go:199:3: return both a `nil` error and an invalid value: use a sentinel error instead (nilnil)
+		return nil, nil
+		^
+yaml_unmarshal_decorator.go:204:4: return both a `nil` error and an invalid value: use a sentinel error instead (nilnil)
+			return nil, nil
+			^
 express.go:41:2: return with no blank line before (nlreturn)
 	return e, nil
 	^
@@ -37,11 +76,50 @@ express.go:118:4: continue with no blank line before (nlreturn)
 lexer.go:133:4: continue with no blank line before (nlreturn)
 			continue
 			^
+yaml_unmarshal_decorator.go:25:5: avoid inline error handling using `if err := ...; err != nil`; use plain assignment `err := ...` (noinlineerr)
+	if err := yaml.Unmarshal(input, out); err != nil {
+	   ^
+yaml_unmarshal_decorator.go:41:5: avoid inline error handling using `if err := ...; err != nil`; use plain assignment `err := ...` (noinlineerr)
+	if err := applyExpressions(value, opts); err != nil {
+	   ^
+yaml_unmarshal_decorator.go:76:8: avoid inline error handling using `if err := ...; err != nil`; use plain assignment `err := ...` (noinlineerr)
+				if err := evaluateField(fieldValue, root, opts); err != nil {
+				   ^
 lexer.go:193:1: named return "endIndex" with type "int" found (nonamedreturns)
 func parseBracketIndex(path string, start int) (endIndex int, isQuoted bool, err error) {
 ^
+yaml_unmarshal_decorator.go:270:1: named return "name" with type "string" found (nonamedreturns)
+func yamlFieldName(field reflect.StructField) (name string, include bool) {
+^
 express.go:1:1: package-comments: should have a package comment (revive)
-package main
+package express
+^
+express.go:20:6: exported: exported type Expression should have comment or be unexported (revive)
+type Expression struct {
+     ^
+express.go:25:1: exported: exported function Compile should have comment or be unexported (revive)
+func Compile(expression string) (*Expression, error) {
+^
+express.go:44:1: exported: exported method Expression.Execute should have comment or be unexported (revive)
+func (e *Expression) Execute(data map[string]any) (any, error) {
+^
+lexer.go:21:6: exported: exported type Lexer should have comment or be unexported (revive)
+type Lexer struct {
+     ^
+lexer.go:27:1: exported: exported function NewLexer should have comment or be unexported (revive)
+func NewLexer(expression string) *Lexer {
+^
+lexer.go:35:1: exported: exported method Lexer.Lex should have comment or be unexported (revive)
+func (l *Lexer) Lex() ([]token, error) {
+^
+yaml_unmarshal_decorator.go:12:6: exported: exported type UnmarshalOption should have comment or be unexported (revive)
+type UnmarshalOption func(*unmarshalOptions)
+     ^
+yaml_unmarshal_decorator.go:18:1: exported: exported function WithEnv should have comment or be unexported (revive)
+func WithEnv() UnmarshalOption {
+^
+yaml_unmarshal_decorator.go:24:1: exported: exported function Unmarshal should have comment or be unexported (revive)
+func Unmarshal(input []byte, out any, options ...UnmarshalOption) error {
 ^
 express.go:77:7: variable name 'b' is too short for the scope of its usage (varnamelen)
 		var b strings.Builder
@@ -61,6 +139,12 @@ lexer.go:129:2: variable name 'i' is too short for the scope of its usage (varna
 lexer.go:202:6: variable name 'i' is too short for the scope of its usage (varnamelen)
 	for i := start + 1; i < len(path); i++ {
 	    ^
+yaml_unmarshal_decorator.go:255:7: variable name 'i' is too short for the scope of its usage (varnamelen)
+		for i := range length {
+		    ^
+yaml_unmarshal_decorator.go:26:10: error returned from external package is unwrapped: sig: func gopkg.in/yaml.v3.Unmarshal(in []byte, out interface{}) (err error) (wrapcheck)
+		return err
+		       ^
 express.go:27:2: missing whitespace above this line (too many statements above if) (wsl_v5)
 	tokens, err := l.Lex()
 	^
@@ -85,13 +169,31 @@ express.go:130:3: missing whitespace above this line (invalid statement above as
 lexer.go:179:3: missing whitespace above this line (invalid statement above assign) (wsl_v5)
 		segments = append(segments, pathSegment{
 		^
-29 issues:
+yaml_unmarshal_decorator.go:30:2: missing whitespace above this line (no shared variables above range) (wsl_v5)
+	for _, option := range options {
+	^
+yaml_unmarshal_decorator.go:240:3: missing whitespace above this line (too many statements above for) (wsl_v5)
+		iter := value.MapRange()
+		^
+yaml_unmarshal_decorator.go:243:4: missing whitespace above this line (too many statements above if) (wsl_v5)
+			elemAny, err := exportValue(iter.Value())
+			^
+yaml_unmarshal_decorator.go:254:3: missing whitespace above this line (too many statements above range) (wsl_v5)
+		out := make([]any, length)
+		^
+61 issues:
 * cyclop: 2
-* exhaustruct: 2
-* gocognit: 1
+* depguard: 1
+* err113: 5
+* exhaustive: 2
+* exhaustruct: 3
+* gocognit: 3
 * nestif: 2
+* nilnil: 2
 * nlreturn: 6
-* nonamedreturns: 1
-* revive: 1
-* varnamelen: 6
-* wsl_v5: 8
+* noinlineerr: 3
+* nonamedreturns: 2
+* revive: 10
+* varnamelen: 7
+* wrapcheck: 1
+* wsl_v5: 12
