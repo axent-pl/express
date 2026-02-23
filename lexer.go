@@ -9,24 +9,26 @@ import (
 )
 
 var (
-	errLexerMultilineExpression    = errors.New("lexer error: multiline expressions are not allowed")
-	errLexerMissingClosingBrace    = errors.New("lexer error: missing closing '}' for placeholder")
-	errLexerPlaceholderPathEmpty   = errors.New("lexer error: placeholder path is empty")
-	errLexerEmptyBracketSegment    = errors.New("lexer error: empty bracket segment in path")
-	errLexerInvalidIndex           = errors.New("lexer error: invalid index in path")
-	errLexerEmptyPathSegment       = errors.New("lexer error: empty path segment")
-	errLexerMissingClosingBracket  = errors.New("lexer error: missing closing ']' in path")
+	errLexerMultilineExpression   = errors.New("lexer error: multiline expressions are not allowed")
+	errLexerMissingClosingBrace   = errors.New("lexer error: missing closing '}' for placeholder")
+	errLexerPlaceholderPathEmpty  = errors.New("lexer error: placeholder path is empty")
+	errLexerEmptyBracketSegment   = errors.New("lexer error: empty bracket segment in path")
+	errLexerInvalidIndex          = errors.New("lexer error: invalid index in path")
+	errLexerEmptyPathSegment      = errors.New("lexer error: empty path segment")
+	errLexerMissingClosingBracket = errors.New("lexer error: missing closing ']' in path")
 )
 
 type Lexer struct {
-	position   int
-	expression string
+	position      int
+	expressionLen int
+	expression    string
 }
 
 func NewLexer(expression string) *Lexer {
 	return &Lexer{
-		position:   0,
-		expression: expression,
+		position:      0,
+		expressionLen: len(expression),
+		expression:    expression,
 	}
 }
 
@@ -48,8 +50,12 @@ func (l *Lexer) Lex() ([]token, error) {
 	}
 }
 
+func (l *Lexer) checkPlaceholderStart() bool {
+	return l.position+1 < l.expressionLen && l.expression[l.position] == '$' && l.expression[l.position+1] == '{'
+}
+
 func (l *Lexer) Next() (token, error) {
-	if l.position >= len(l.expression) {
+	if l.position >= l.expressionLen {
 		return token{}, io.EOF
 	}
 
@@ -57,7 +63,7 @@ func (l *Lexer) Next() (token, error) {
 		return token{}, errLexerMultilineExpression
 	}
 
-	if strings.HasPrefix(l.expression[l.position:], "${") {
+	if l.checkPlaceholderStart() {
 		start := l.position
 		end := strings.IndexByte(l.expression[start:], '}')
 		if end < 0 {
@@ -97,7 +103,7 @@ func (l *Lexer) Next() (token, error) {
 	}
 
 	start := l.position
-	for l.position < len(l.expression) {
+	for l.position < l.expressionLen {
 		if l.expression[l.position] == '\n' || l.expression[l.position] == '\r' {
 			return token{}, errLexerMultilineExpression
 		}
