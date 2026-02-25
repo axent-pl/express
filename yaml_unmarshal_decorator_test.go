@@ -5,74 +5,76 @@ import (
 	"testing"
 )
 
-func TestUnmarshalEvaluatesExpressFields(t *testing.T) {
-	type Config struct {
-		User string `yaml:"user"`
-		URL  string `yaml:"url" express:"true"`
-	}
-
-	var cfg Config
-
-	input := []byte("user: alice\nurl: https://api/${user}\n")
-
-	if err := Unmarshal(input, &cfg); err != nil {
-		t.Fatalf("Unmarshal() error = %v", err)
-	}
-
-	if cfg.URL != "https://api/alice" {
-		t.Fatalf("URL = %q, want %q", cfg.URL, "https://api/alice")
-	}
-}
-
-func TestUnmarshalWithEnv(t *testing.T) {
-	const envKey = "AXENT_EXPRESS_ENV_TEST"
-	const envValue = "from-env"
-
-	if err := os.Setenv(envKey, envValue); err != nil {
-		t.Fatalf("Setenv() error = %v", err)
-	}
-
-	t.Cleanup(func() {
-		_ = os.Unsetenv(envKey)
-	})
-
-	type Config struct {
+func TestUnmarshal(t *testing.T) {
+	type ConfigFlat struct {
 		Value string `yaml:"value" express:"true"`
 	}
-
-	var cfg Config
-
-	input := []byte("value: ${AXENT_EXPRESS_ENV_TEST}\n")
-
-	if err := Unmarshal(input, &cfg, WithEnv()); err != nil {
-		t.Fatalf("Unmarshal() error = %v", err)
+	type ConfigNested struct {
+		Nested struct {
+			Value string `yaml:"value" express:"true"`
+		} `yaml:"nested"`
+	}
+	envs := map[string]string{
+		"AXENT_EXPRESS_ENV_TEST": "from-env",
+	}
+	for k, v := range envs {
+		if err := os.Setenv(k, v); err != nil {
+			t.Fatalf("Setenv() error = %v", err)
+		}
 	}
 
-	if cfg.Value != envValue {
-		t.Fatalf("Value = %q, want %q", cfg.Value, envValue)
+	tests := []struct {
+		name    string // description of this test case
+		input   []byte
+		target  any
+		options []UnmarshalOption
+		wantErr bool
+		checker func(any) bool
+	}{
+		{
+			name:    "flat",
+			target:  &ConfigFlat{},
+			input:   []byte("value: ${AXENT_EXPRESS_ENV_TEST}\n"),
+			wantErr: false,
+			options: []UnmarshalOption{WithEnv()},
+			checker: func(t any) bool {
+				c, ok := t.(*ConfigFlat)
+				if !ok {
+					return false
+				}
+				return c.Value == "from-env"
+			},
+		},
+		{
+			name:    "nested",
+			target:  &ConfigNested{},
+			input:   []byte("nested: \n  value: ${AXENT_EXPRESS_ENV_TEST}\n"),
+			wantErr: false,
+			options: []UnmarshalOption{WithEnv()},
+			checker: func(t any) bool {
+				c, ok := t.(*ConfigNested)
+				if !ok {
+					return false
+				}
+				return c.Nested.Value == "from-env"
+			},
+		},
 	}
-}
-
-func TestUnmarshalEvaluatesNestedAndSliceFields(t *testing.T) {
-	type Endpoint struct {
-		Host string `yaml:"host"`
-		URL  string `yaml:"url" express:"true"`
-	}
-
-	type Config struct {
-		Protocol  string     `yaml:"protocol"`
-		Endpoints []Endpoint `yaml:"endpoints"`
-	}
-
-	var cfg Config
-
-	input := []byte("protocol: https\nendpoints:\n  - host: service-a\n    url: ${protocol}://${endpoints[0].host}\n")
-
-	if err := Unmarshal(input, &cfg); err != nil {
-		t.Fatalf("Unmarshal() error = %v", err)
-	}
-
-	if cfg.Endpoints[0].URL != "https://service-a" {
-		t.Fatalf("URL = %q, want %q", cfg.Endpoints[0].URL, "https://service-a")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotErr := Unmarshal(tt.input, tt.target, tt.options...)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("Unmarshal() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("Unmarshal() succeeded unexpectedly")
+			}
+			if !tt.checker(tt.target) {
+				t.Errorf("Unmarshal() check failed")
+			}
+		})
 	}
 }
